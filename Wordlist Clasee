@@ -37,7 +37,7 @@ public class WordList implements List<Word> {
 			indexOf(e).increase();
 			return true;
 		}
-		
+		if(indexOf(e)<size())
 		
 		
 		return false;
