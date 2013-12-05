@@ -1,0 +1,95 @@
+import java.io.*;
+import java.util.*;
+import javax.swing.*;
+
+
+public class Driver {
+        static Map<String,Set<String>> wordmap = new HashMap();
+        
+                public static void main(String[]args){
+                        File f = new File("D:\\wordsEN.txt");
+                        inputFile(f);
+                        String message = "";
+                        Alphabetize q = new Alphabetize();
+                        String key = q.keyMaker(userInteraction());
+                        Alphabits x = new Alphabits();
+                        for(String r: x.makeKeys(key))
+                        {
+                        if(wordmap.get(r)!=null){
+                               
+                        
+                                
+                                for(String l :wordmap.get(r)){
+                                        message +=l;
+                                        message +=" ";
+                                }
+                                
+                        }
+                       
+                        }
+                        if(message!="")
+                        JOptionPane.showMessageDialog(null, "Wordlist: " + message);
+                        else{
+                        JOptionPane.showMessageDialog(null, "Sorry, no match.");
+                        }
+                }
+
+                private static String userInteraction() {
+                        String m = JOptionPane.showInputDialog("Enter Letters Yo");
+                        while(m.length()>16){
+                        	m =JOptionPane.showInputDialog("Enter Something less than 16 letters");
+                        }
+                        return m;
+                }
+
+                private static void inputFile(File f) 
+                        {
+                        
+                          Scanner in;
+                      Alphabetize q = new Alphabetize();
+              
+              try
+                      {
+                   in = new Scanner(f);
+                   
+                     while(in.hasNext())
+                           {
+                                     
+                                     addWord(in.next());
+                                    
+                           }
+                           
+                      }
+              catch(IOException i)
+                              {
+                                      System.out.println("Error: " + i.getMessage());
+                              }
+                        }
+
+				private static void addWord(String next) {
+					// TODO Auto-generated method stub
+					
+					Alphabetize q = new Alphabetize();
+					String tempkey = q.keyMaker(next);
+					if(!wordmap.containsKey(tempkey)){
+						wordmap.put(tempkey, new HashSet<String>());
+						wordmap.get(tempkey).add(next);
+					}
+					else{
+						wordmap.get(tempkey).add(next);
+					}
+				}
+
+				private static String splitKey(ArrayList<String> keys, String key,int num) {
+					// TODO Auto-generated method stub
+					String tempkey = "";
+					for(int f = 0; f<num;f++){
+						tempkey+=key.charAt(f);
+					}
+					
+					return tempkey;
+				}
+                
+                
+                
+}
