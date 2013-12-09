@@ -1,26 +1,45 @@
 import java.util.*;
 public class Alphabits {
-
-	public Set<String> makeKeys(String key){
-		Set<String> set = new HashSet<String>();
+		static int scrambleselection= 0;
 		
-
-		for(int z = 0; z < key.length();z++) {
-		    Set<String> temp = new HashSet<String>();
-		    char c = key.charAt(z);        
-
-		    //s1 = t*s0 ∪ {t} ∪ s0 = {t}
-		    for(String str: set) 
-		        temp.add(str + c);
-		    String m = ""+c;
-		    set.add(m);   
-		    set.addAll(temp); 
-		}
-		return set;
-	}
-	public static void main (String[] args)
-	{
-	
+		public Set<String> makeKeysR(String key){
+            Set<String> set = new HashSet<String>();
+       
+            return set;
+    }
 		
-	}
+        public Set<String> makeKeys(String key){
+                Set<String> set = new HashSet<String>();
+                
+
+                for(int z = 0; z < key.length();z++) {
+                	
+                	if(scrambleselection==0){
+                    Set<String> temp = new HashSet<String>();
+                    char c = key.charAt(z);        
+                    
+                    //s1 = t*s0 ∪ {t} ∪ s0 = {t}
+                    for(String str: set) 
+                        temp.add(str + c);
+                    String m = ""+c;
+                    set.add(m);   
+                    set.addAll(temp); 
+                	}
+                	else{set.add(key);}
+                }
+                return set;
+        }
+        
+        public void jumble(){
+        	scrambleselection =1;
+        }
+        
+     
+    
+        
+        public static void main (String[] args)
+        {
+        
+                
+        }
 }
