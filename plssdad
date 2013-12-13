@@ -1,0 +1,182 @@
+import java.util.ArrayList;
+import java.util.HashSet;
+
+import javax.swing.JOptionPane;
+
+import info.gridworld.grid.BoundedGrid;
+import info.gridworld.grid.Location;
+import info.gridworld.world.World;
+
+
+public class MineSweeperWorld extends World<Object>{
+	
+	private int clickCount;
+	private HashSet<Location> clicked= new HashSet<Location>();
+	private boolean rightClick = false;
+	public MineSweeperWorld(int r, int c, int mine){
+		super(new BoundedGrid<Object>(r,c));
+		this.show();
+		placeMines(mine);
+		container();
+	
+		setMessage("Welcome to MineSweeper! To begin click anywhere.");
+		
+	}
+	
+	private void container(){
+		for(int i = 0;i<this.getGrid().getNumRows();i++){
+			for(int i2 = 0;i2<this.getGrid().getNumCols();i2++){
+				Display x = new Display(this.getGrid().get(new Location (i,i2)));
+				this.add(new Location (i, i2), x);
+			}
+			
+		}
+	}
+	
+	
+	
+	@Override
+	public boolean keyPressed(String q, Location loc){
+		if(q.equalsIgnoreCase("a")){ 
+			if(this.getGrid().get(loc)instanceof Flag){
+				this.getGrid().remove(loc);
+				this.add(loc, new Mine());
+			}else if(this.getGrid().get(loc)instanceof Mine){
+			this.getGrid().remove(loc);
+			this.add(loc, new Flag());
+			}
+		}
+		
+		
+		return true;
+	}
+	
+	private void putNumbers(Location loc) {
+	
+				int mineCount =0;
+				if(this.getGrid().get(loc)instanceof Display){
+				Display test =  (Display) (this.getGrid().get(loc));
+				if(!(test.retObj() instanceof Mine)){
+					for(Object q : this.getGrid().getOccupiedAdjacentLocations(loc)){
+							Location pie = (Location) q;
+							if(this.getGrid().get(pie)instanceof Display){
+							Display test2 =  (Display)(this.getGrid().get(pie));
+							
+								if(test2.retObj()instanceof Mine){
+								mineCount++;
+								}
+							
+							}
+		}
+					if(mineCount!=0){
+							this.getGrid().put(loc, mineCount );
+					}
+					else{
+				
+						for(int i = 0;i<this.getGrid().getValidAdjacentLocations(loc).size();i++){
+						locationClicked((Location) this.getGrid().getValidAdjacentLocations(loc).get(i));
+						if(this.getGrid().get(this.getGrid().getValidAdjacentLocations(loc).get(i))instanceof Display)
+						this.getGrid().remove(this.getGrid().getValidAdjacentLocations(loc).get(i));
+						}
+					}
+				}
+				}
+			}
+		
+	
+
+	@Override
+	public boolean locationClicked(Location x){	
+//		if(!rightClick ){
+//		rightClick(x);
+//		return true;
+//		}
+//		else
+			leftClick(x);
+		return true;
+	}
+	
+	
+	private void rightClick(Location x) {
+		// TODO Auto-generated method stub
+		if(clicked.contains(x)){
+			this.setMessage("Click on something else");
+		}
+		else {
+			if(this.getGrid().get(x)instanceof Flag){
+			this.remove(x);
+			this.add(x, "?");
+			JOptionPane.showMessageDialog(null, "Flagged");
+			
+			}
+			else{
+				if(this.getGrid().get(x).equals("?")){
+				this.remove(x);
+				this.add(x, new Flag());
+				JOptionPane.showMessageDialog(null, "?");
+				}
+				else{
+					
+				}
+			}
+		}
+	}
+
+	private void leftClick(Location x) {
+		// TODO Auto-generated method stub
+
+		if(clickCount==0){
+			firstClick(x);
+			clicked.add(x);
+			putNumbers(x);
+			setMessage("You clicked on "+x);
+		}
+		else if(clicked.contains(x)){
+			this.setMessage("Click on something else");
+		}
+		else {
+			
+			if(this.getGrid().get(x)instanceof Display){
+			Display test =  (Display)(this.getGrid().get(x));
+			if(test.retObj()instanceof Mine){
+			this.remove(x);
+			this.add(x, new Explode());
+			JOptionPane.showMessageDialog(null, "U  LOST");
+			
+			
+			}
+			else{
+				clicked.add(x);
+				putNumbers(x);
+				setMessage("You clicked on "+x);
+			}
+			}
+		}
+		
+		
+		
+		clickCount++;
+		return;
+	}
+
+	private void firstClick(Location x) {
+		// TODO Auto-generated method stub
+		Display test = (Display) (this.getGrid().get(x));
+	if(test.retObj()instanceof Mine){
+		this.getGrid().remove(x);
+		Location temp = getRandomEmptyLocation();
+		this.add(temp, test);
+
+		}
+	}
+
+	private void placeMines(int mine) {
+		// TODO Auto-generated method stub
+		while(mine>0){
+			Location temp = getRandomEmptyLocation();
+			this.add(temp, new Mine(temp));
+			mine--;
+		}
+	}
+	
+}
