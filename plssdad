@@ -1,5 +1,7 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.util.Timer;
 
 import javax.swing.JOptionPane;
@@ -16,11 +18,13 @@ public class MineSweeperWorld extends World<Object>{
 	int col;
 	int clickCount = 0;
 	int time=0;
+	int mine;
 	public MineSweeperWorld(int r, int c, int mine){
 		super(new BoundedGrid<Object>(r,c));
 		mineWorld = new int[r][c];
 		rows = r;
 		col= c;
+		this.mine=mine;
 		this.show();
 		placeMines(mine);
 		appear();
@@ -29,7 +33,11 @@ public class MineSweeperWorld extends World<Object>{
 		setMessage("Welcome to MineSweeper! To begin click anywhere.");
 	
 	}
-	
+	public void keyTyped(MouseEvent key,Location x){
+		if(key.getButton()==2){
+			rightClick(x);
+		}
+	}
 	ActionListener manas = new ActionListener(){
 		@Override
 		public void actionPerformed(ActionEvent x){
@@ -78,25 +86,46 @@ public class MineSweeperWorld extends World<Object>{
 	@Override
 	public boolean keyPressed(String s, Location loc){
 		if(s.equals("SPACE")){
+			
 			if(rightClick){
 				rightClick = false;
+				
 				JOptionPane.showMessageDialog(null, "RIGHT CLICK DISABLED");
+				
 			}
 			else{
 				rightClick= true;
+				
 				JOptionPane.showMessageDialog(null, "RIGHT CLICK ENABLED");
+				
 			}
-			
+		}			
 			return true;
-		}
-		
-		
-		return false;
 		
 	}
 	
+	private boolean gameCheck() {
+		// TODO Auto-generated method stub
+		int mineCounter=0;
+		for(int i = 0; i<rows;i++){
+			for(int i2 = 0 ;i2<col;i2++){
+				if(this.getGrid().get(new Location(i,i2))instanceof Flag && mineWorld[i][i2]=='b'){
+						mineCounter++;
+				}
+				
+			}
+		}
+		if(mineCounter == this.mine){
+			JOptionPane.showMessageDialog(null, "A winner is you!");
+			return true;
+		}else{
+		return false;
+		}
+	}
+
 	@Override
 	public boolean locationClicked(Location loc){
+	
 		if(rightClick){
 			rightClick(loc);
 			for(int q = 0;q<rows;q++){
@@ -120,7 +149,7 @@ public class MineSweeperWorld extends World<Object>{
 	}
 	
 	private void leftClick(Location loc) {
-		if(!(this.getGrid().get(loc)instanceof Flag)){
+		if(this.getGrid().get(loc)instanceof Display){
 		int row1=loc.getRow(); int col1 =loc.getCol();
 		if(mineWorld[row1][col1]=='b'){
 			boom();
@@ -151,9 +180,14 @@ public class MineSweeperWorld extends World<Object>{
 
 	private void rightClick(Location loc) {
 		// TODO Auto-generated method stub
+		
 		if(this.getGrid().get(loc)instanceof Display){
 			this.remove(loc);
 			this.add(loc, new Flag(mineWorld[loc.getRow()][loc.getCol()]));
+			if(gameCheck()){
+			
+				return;
+			}
 		}else if(this.getGrid().get(loc)instanceof Quest){
 			Quest temp = (Quest) this.getGrid().get(loc);
 			this.remove(loc);
