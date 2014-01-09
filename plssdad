@@ -33,23 +33,7 @@ public class MineSweeperWorld extends World<Object>{
 		setMessage("Welcome to MineSweeper! To begin click anywhere.");
 	
 	}
-	public void keyTyped(MouseEvent key,Location x){
-		if(key.getButton()==2){
-			rightClick(x);
-		}
-	}
-	ActionListener manas = new ActionListener(){
-		@Override
-		public void actionPerformed(ActionEvent x){
-			time++;
-		}
-		
-		
-		
-	};
-	int delay = 1000;
-	Timer manas2 = new Timer();
-	private boolean rightClick = false;
+
 	
 	private void contain() {
 		// TODO Auto-generated method stub
@@ -62,6 +46,23 @@ public class MineSweeperWorld extends World<Object>{
 		}
 	}
 
+	void reset(){
+		for(int i = 0; i<rows;i++){
+			for(int i2 = 0 ;i2<col;i2++){
+				this.getGrid().remove(new Location(i,i2));
+				
+			}
+		}
+		mineWorld = new int[rows][col];
+		this.show();
+		placeMines(mine);
+		appear();
+		putNum();
+		contain();
+		setMessage("Welcome to MineSweeper! To begin click anywhere.");
+	
+	}
+	
 	private void putNum() {
 	for(int q = 0;q<rows;q++){
 		for(int q2 = 0; q2<col;q2++){
@@ -83,30 +84,20 @@ public class MineSweeperWorld extends World<Object>{
 	}
 	}
 	
-	@Override
-	public boolean keyPressed(String s, Location loc){
-		if(s.equals("SPACE")){
-			
-			if(rightClick){
-				rightClick = false;
-				
-				JOptionPane.showMessageDialog(null, "RIGHT CLICK DISABLED");
-				
-			}
-			else{
-				rightClick= true;
-				
-				JOptionPane.showMessageDialog(null, "RIGHT CLICK ENABLED");
-				
-			}
-		}			
-			return true;
-		
-	}
+
 	
 	private boolean gameCheck() {
 		// TODO Auto-generated method stub
 		int mineCounter=0;
+		int displayCount=0;
+		for(int i = 0; i<rows;i++){
+			for(int i2 = 0 ;i2<col;i2++){
+				if(this.getGrid().get(new Location(i,i2))instanceof Display){
+						displayCount++;
+				}
+				
+			}
+		}
 		for(int i = 0; i<rows;i++){
 			for(int i2 = 0 ;i2<col;i2++){
 				if(this.getGrid().get(new Location(i,i2))instanceof Flag && mineWorld[i][i2]=='b'){
@@ -115,8 +106,9 @@ public class MineSweeperWorld extends World<Object>{
 				
 			}
 		}
-		if(mineCounter == this.mine){
+		if(mineCounter == this.mine && displayCount ==0){
 			JOptionPane.showMessageDialog(null, "A winner is you!");
+			reset();
 			return true;
 		}else{
 		return false;
@@ -124,9 +116,9 @@ public class MineSweeperWorld extends World<Object>{
 	}
 
 	@Override
-	public boolean locationClicked(Location loc){
-	
-		if(rightClick){
+	public boolean locationClicked(Location loc, int btn){
+		
+		if(btn==3){
 			rightClick(loc);
 			for(int q = 0;q<rows;q++){
 				for(int q2 = 0; q2<col;q2++){
@@ -145,6 +137,7 @@ public class MineSweeperWorld extends World<Object>{
 				System.out.println();
 				}
 		}
+		gameCheck();
 		return true;
 	}
 	
@@ -164,6 +157,7 @@ public class MineSweeperWorld extends World<Object>{
 			this.add(loc, mineWorld[row1][col1]);
 		}
 	 }
+		
 	}
 
 	private void boom() {
@@ -176,6 +170,7 @@ public class MineSweeperWorld extends World<Object>{
 			}
 		}
 		JOptionPane.showMessageDialog(null,"You lose");
+		reset();
 	}
 
 	private void rightClick(Location loc) {
@@ -184,10 +179,6 @@ public class MineSweeperWorld extends World<Object>{
 		if(this.getGrid().get(loc)instanceof Display){
 			this.remove(loc);
 			this.add(loc, new Flag(mineWorld[loc.getRow()][loc.getCol()]));
-			if(gameCheck()){
-			
-				return;
-			}
 		}else if(this.getGrid().get(loc)instanceof Quest){
 			Quest temp = (Quest) this.getGrid().get(loc);
 			this.remove(loc);
@@ -217,7 +208,7 @@ public class MineSweeperWorld extends World<Object>{
 	
 	private void placeMines( int mine) {
 		// TODO Auto-generated method stub
-		for(int i = 0; i<mine;i++)
+		for(int i = 0; i<mine+1;i++)
 		mineWorld[(int) (Math.random()*rows)][(int) (Math.random()*col)] = 'b';
 			
 	}
